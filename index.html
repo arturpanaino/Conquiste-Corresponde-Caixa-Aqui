@@ -49,7 +49,7 @@
             <span id="indicator-4">4. Resumo</span>
         </div>
 
-        <form id="simulacaoForm" onsubmit="event.preventDefault();">
+        <form id="simulacaoForm" onsubmit="enviarDadosParaServidor(event)">
             
             <div id="step-1" class="step active">
                 <h2 class="text-xl font-bold mb-1">Tipo de operação</h2>
@@ -220,7 +220,7 @@
         </form>
     </div>
 
-    <script>
+<script>
         // --- 1. MÁSCARAS DE INPUT (IMask) ---
         const currencyOptions = {
             mask: 'R$ num',
@@ -260,7 +260,6 @@
 
         // --- 3. NAVEGAÇÃO E VALIDAÇÃO BÁSICA ---
         function nextStep(current, next) {
-            // Verifica se os campos required da etapa atual estão preenchidos
             const stepDiv = document.getElementById(`step-${current}`);
             const inputs = stepDiv.querySelectorAll('input[required], select[required]');
             let valid = true;
@@ -302,7 +301,6 @@
 
         // --- 4. GERAÇÃO DO RESUMO ---
         function gerarResumo() {
-            // Primeiro valida a etapa 3
             const stepDiv = document.getElementById('step-3');
             const inputs = stepDiv.querySelectorAll('input[required], select[required]');
             let valid = true;
@@ -317,14 +315,12 @@
                 return;
             }
 
-            // Coleta os dados
             const form = document.getElementById('simulacaoForm');
             const formData = new FormData(form);
             
             let tipoEmpresaTexto = formData.get('tipoEmpresa') ? ` — ${formData.get('tipoEmpresa')}` : '';
             let comprovacaoFinal = `${formData.get('tipoRenda')}${tipoEmpresaTexto}`;
 
-            // Cria o HTML do resumo (tabela baseada no print)
             const resumoHtml = `
                 <div class="flex justify-between border-b border-orange-200 pb-2">
                     <span class="text-gray-600">Modalidade</span>
@@ -366,6 +362,47 @@
 
             document.getElementById('resumoContent').innerHTML = resumoHtml;
             goToStep(4);
+        }
+
+        // --- 5. ENVIO DOS DADOS PARA O BACK-END (A NOVA FUNÇÃO ENTRA AQUI) ---
+        async function enviarDadosParaServidor(event) {
+            event.preventDefault(); // Impede o recarregamento da página
+
+            const btnEnviar = event.target.querySelector('button[type="submit"]');
+            btnEnviar.innerText = "Enviando... ⏳";
+            btnEnviar.disabled = true;
+
+            const form = document.getElementById('simulacaoForm');
+            const formData = new FormData(form);
+            
+            // Converte os dados do formulário para um objeto JSON
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/simulacao', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.success) {
+                    alert('🎉 Perfeito! Sua simulação foi enviada com sucesso. Nossa equipe entrará em contato em breve.');
+                    form.reset();
+                    goToStep(1); // Retorna para a primeira etapa
+                } else {
+                    alert('❌ Ocorreu um erro ao enviar. Por favor, tente novamente.');
+                }
+            } catch (erro) {
+                console.error('Erro na requisição:', erro);
+                alert('❌ Erro de conexão com o servidor.');
+            } finally {
+                btnEnviar.innerText = "Enviar Simulação ✓";
+                btnEnviar.disabled = false;
+            }
         }
     </script>
 </body>
