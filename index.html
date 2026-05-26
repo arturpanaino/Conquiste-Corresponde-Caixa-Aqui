@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação - Conquiste Caixa Aqui</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        caixaBlue: '#005CA9',
+                        caixaOrange: '#F39200',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Oculta as etapas que não estão ativas */
+        .step { display: none; }
+        .step.active { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center py-10 px-4 font-sans">
+
+    <div class="max-w-2xl w-full text-center mb-8">
+        <h1 class="text-3xl font-bold text-caixaBlue mb-2">Conquiste Caixa Aqui</h1>
+        <p class="text-gray-600 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            Bem-vindo ao nosso simulador habitacional! Por favor, preencha todos os dados abaixo com atenção para que possamos encontrar a melhor condição de financiamento para você. Todos os campos são obrigatórios.
+        </p>
+    </div>
+
+    <div class="max-w-2xl w-full bg-white p-6 md:p-8 rounded-xl shadow-md border-t-4 border-caixaOrange">
+        
+        <div class="mb-6 border-b pb-4 flex justify-between text-sm text-gray-500 font-medium">
+            <span id="indicator-1" class="text-caixaBlue">1. Operação</span>
+            <span id="indicator-2">2. Compradores</span>
+            <span id="indicator-3">3. Renda</span>
+            <span id="indicator-4">4. Resumo</span>
+        </div>
+
+        <form id="simulacaoForm">
+            <div id="step-1" class="step active">
+                <h2 class="text-xl font-bold text-gray-800 mb-1">Tipo de operação</h2>
+                <p class="text-sm text-gray-500 mb-6">Qual é o objetivo do financiamento?</p>
+
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Modalidade</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 focus-within:ring-2 focus-within:ring-caixaBlue">
+                            <input type="radio" name="modalidade" value="Aquisição de imóvel novo" required class="w-4 h-4 text-caixaBlue focus:ring-caixaBlue border-gray-300">
+                            <span class="ml-3 text-gray-700">Aquisição de imóvel novo</span>
+                        </label>
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 focus-within:ring-2 focus-within:ring-caixaBlue">
+                            <input type="radio" name="modalidade" value="Aquisição de imóvel usado" class="w-4 h-4 text-caixaBlue focus:ring-caixaBlue border-gray-300">
+                            <span class="ml-3 text-gray-700">Aquisição de imóvel usado</span>
+                        </label>
+                        </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do imóvel / terreno (R$)</label>
+                    <input type="text" name="valorImovel" placeholder="Ex: 350.000,00" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caixaBlue focus:outline-none">
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button type="button" onclick="nextStep(2)" class="bg-caixaBlue hover:bg-blue-800 text-white font-medium py-2 px-6 rounded-lg transition duration-200">
+                        Próximo ➔
+                    </button>
+                </div>
+            </div>
+
+            <div id="step-2" class="step">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Perfil dos compradores</h2>
+                <p class="text-gray-500 mb-6">Campos da etapa 2 entrarão aqui...</p>
+                <div class="mt-8 flex justify-between">
+                    <button type="button" onclick="prevStep(1)" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition duration-200">
+                        ⬅ Voltar
+                    </button>
+                    <button type="button" onclick="nextStep(3)" class="bg-caixaBlue hover:bg-blue-800 text-white font-medium py-2 px-6 rounded-lg transition duration-200">
+                        Próximo ➔
+                    </button>
+                </div>
+            </div>
+            
+            </form>
+    </div>
+
+    <script>
+        // Lógica simples de navegação entre as abas
+        function nextStep(stepNumber) {
+            // Futuramente: Adicionar validação para checar se os campos obrigatórios estão preenchidos antes de avançar
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${stepNumber}`).classList.add('active');
+            atualizarProgresso(stepNumber);
+        }
+
+        function prevStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${stepNumber}`).classList.add('active');
+            atualizarProgresso(stepNumber);
+        }
+
+        function atualizarProgresso(stepNumber) {
+            for(let i=1; i<=4; i++) {
+                const indicator = document.getElementById(`indicator-${i}`);
+                if(indicator) {
+                    indicator.classList.remove('text-caixaBlue', 'font-bold');
+                    if(i === stepNumber) {
+                        indicator.classList.add('text-caixaBlue', 'font-bold');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
