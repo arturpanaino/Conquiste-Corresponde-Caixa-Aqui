@@ -365,6 +365,7 @@
         }
 
         // --- 5. ENVIO DOS DADOS PARA O BACK-END (A NOVA FUNÇÃO ENTRA AQUI) ---
+        // --- 5. ENVIO DOS DADOS (VIA FORMSUBMIT - SEM BLOQUEIO) ---
         async function enviarDadosParaServidor(event) {
             event.preventDefault(); // Impede o recarregamento da página
 
@@ -374,22 +375,33 @@
 
             const form = document.getElementById('simulacaoForm');
             const formData = new FormData(form);
-            
-            // Converte os dados do formulário para um objeto JSON
             const data = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch('/api/simulacao', {
+                // Usando a API gratuita FormSubmit (resolve o bloqueio do Render)
+                const response = await fetch('https://formsubmit.co/ajax/arturpanaino@gmail.com', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        _subject: `🚨 Nova Simulação - ${data.modalidade}`,
+                        _template: "table", // Deixa o e-mail formatado como tabela
+                        _captcha: "false",  // Desativa o captcha para não atrapalhar o cliente
+                        "1. Modalidade": data.modalidade,
+                        "2. Valor do Imóvel": data.valorImovel,
+                        "3. Já possui imóvel na cidade?": data.possuiImovel,
+                        "4. Data de Nascimento": data.dataNascimento,
+                        "5. Mais de 1 comprador ou dependente?": data.maisCompradores,
+                        "6. FGTS +3 anos?": data.fgts,
+                        "7. Funcionário público?": data.funcPublico,
+                        "8. Renda Familiar Bruta": data.rendaFamiliar,
+                        "9. Comprovação de Renda": `${data.tipoRenda} ${data.tipoEmpresa ? '— ' + data.tipoEmpresa : ''}`
+                    })
                 });
 
-                const resultado = await response.json();
-
-                if (resultado.success) {
+                if (response.ok) {
                     alert('🎉 Perfeito! Sua simulação foi enviada com sucesso. Nossa equipe entrará em contato em breve.');
                     form.reset();
                     goToStep(1); // Retorna para a primeira etapa
@@ -398,7 +410,7 @@
                 }
             } catch (erro) {
                 console.error('Erro na requisição:', erro);
-                alert('❌ Erro de conexão com o servidor.');
+                alert('❌ Erro de conexão com o sistema de e-mails.');
             } finally {
                 btnEnviar.innerText = "Enviar Simulação ✓";
                 btnEnviar.disabled = false;
