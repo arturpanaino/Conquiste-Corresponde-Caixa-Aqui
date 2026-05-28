@@ -60,6 +60,12 @@
                 <h2 class="text-xl font-bold mb-1">Tipo de operação</h2>
                 <p class="text-sm text-gray-500 mb-6">Qual é o objetivo do financiamento?</p>
 
+                <!-- NOVO CAMPO: NOME COMPLETO -->
+                <div class="mb-5">
+                    <label class="block text-sm font-medium mb-2">Nome e Sobrenome</label>
+                    <input type="text" id="nome" name="nome" placeholder="Ex: Rodrigo Panaino" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-caixaBlue focus:outline-none" required>
+                </div>
+                
                 <div class="mb-5">
                     <label class="block text-sm font-medium mb-3">Modalidade</label>
                     <div class="space-y-3">
@@ -327,6 +333,16 @@
             let comprovacaoFinal = `${formData.get('tipoRenda')}${tipoEmpresaTexto}`;
 
             const resumoHtml = `
+            <!-- NOVO CAMPO NO RESUMO -->
+                <div class="flex justify-between border-b border-orange-200 pb-2">
+                    <span class="text-gray-600">Nome</span>
+                    <span class="font-bold text-right">${formData.get('nome')}</span>
+                </div>
+                
+                <div class="flex justify-between border-b border-orange-200 pb-2">
+                    <span class="text-gray-600">Modalidade</span>
+                    <span class="font-bold text-right">${formData.get('modalidade')}</span>
+                </div>
                 <div class="flex justify-between border-b border-orange-200 pb-2">
                     <span class="text-gray-600">Modalidade</span>
                     <span class="font-bold">${formData.get('modalidade')}</span>
@@ -369,7 +385,7 @@
             goToStep(4);
         }
 
-        // --- 5. ENVIO DOS DADOS PARA O BACK-END (A NOVA FUNÇÃO ENTRA AQUI) ---
+        -
         // --- 5. ENVIO DOS DADOS (VIA FORMSUBMIT - SEM BLOQUEIO) ---
         async function enviarDadosParaServidor(event) {
             event.preventDefault(); // Impede o recarregamento da página
@@ -391,18 +407,19 @@
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        _subject: `🚨 Nova Simulação - ${data.modalidade}`,
-                        _template: "table", // Deixa o e-mail formatado como tabela
-                        _captcha: "false",  // Desativa o captcha para não atrapalhar o cliente
-                        "1. Modalidade": data.modalidade,
-                        "2. Valor do Imóvel": data.valorImovel,
-                        "3. Já possui imóvel na cidade?": data.possuiImovel,
-                        "4. Data de Nascimento": data.dataNascimento,
-                        "5. Mais de 1 comprador ou dependente?": data.maisCompradores,
-                        "6. FGTS +3 anos?": data.fgts,
-                        "7. Funcionário público?": data.funcPublico,
-                        "8. Renda Familiar Bruta": data.rendaFamiliar,
-                        "9. Comprovação de Renda": `${data.tipoRenda} ${data.tipoEmpresa ? '— ' + data.tipoEmpresa : ''}`
+                        _subject: `🚨 Nova Simulação: ${data.nome} - ${data.modalidade}`, // Adicionei o nome no título do e-mail também!
+                        _template: "table",
+                        _captcha: "false",
+                        "1. Nome do Cliente": data.nome,
+                        "2. Modalidade": data.modalidade,
+                        "3. Valor do Imóvel": data.valorImovel,
+                        "4. Já possui imóvel na cidade?": data.possuiImovel,
+                        "5. Data de Nascimento": data.dataNascimento,
+                        "6. Mais de 1 comprador ou dependente?": data.maisCompradores,
+                        "7. FGTS +3 anos?": data.fgts,
+                        "8. Funcionário público?": data.funcPublico,
+                        "9. Renda Familiar Bruta": data.rendaFamiliar,
+                        "10. Comprovação de Renda": `${data.tipoRenda} ${data.tipoEmpresa ? '— ' + data.tipoEmpresa : ''}`
                     })
                 });
 
